@@ -1,0 +1,558 @@
+Enter password: ********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.4.9 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2026, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases
+    -> ;
++--------------------+
+| Database           |
++--------------------+
+| company            |
+| data_engineering   |
+| employee           |
+| hospital           |
+| information_schema |
+| library            |
+| mysql              |
+| performance_schema |
+| school             |
+| schools            |
+| studentdb          |
+| sys                |
+| world              |
++--------------------+
+13 rows in set (0.04 sec)
+
+mysql> CREATE DATABASE EmployeeDepartment;
+Query OK, 1 row affected (0.01 sec)
+
+mysql>
+mysql> USE EmployeeDepartment;
+Database changed
+mysql> CREATE TABLE departments (
+    ->     dept_id INT PRIMARY KEY,
+    ->     dept_name VARCHAR(50),
+    ->     location VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE employees (
+    ->     emp_id INT PRIMARY KEY,
+    ->     emp_name VARCHAR(50),
+    ->     salary DECIMAL(10,2),
+    ->     dept_id INT,
+    ->     city VARCHAR(50),
+    ->     FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+    -> );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> INSERT INTO departments (dept_id, dept_name, location)
+    -> VALUES
+    -> (1, 'HR', 'Bangalore'),
+    -> (2, 'IT', 'Mumbai'),
+    -> (3, 'Finance', 'Delhi'),
+    -> (4, 'Marketing', 'Chennai'),
+    -> (5, 'Production', 'Pune');
+Query OK, 5 rows affected (0.04 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM departments;
++---------+------------+-----------+
+| dept_id | dept_name  | location  |
++---------+------------+-----------+
+|       1 | HR         | Bangalore |
+|       2 | IT         | Mumbai    |
+|       3 | Finance    | Delhi     |
+|       4 | Marketing  | Chennai   |
+|       5 | Production | Pune      |
++---------+------------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> INSERT INTO employees (emp_id, emp_name, salary, dept_id, city)
+    -> VALUES
+    -> (101, 'Rahul', 45000, 1, 'Bangalore'),
+    -> (102, 'Priya', 60000, 2, 'Mumbai'),
+    -> (103, 'Arun', 55000, 2, 'Delhi'),
+    -> (104, 'Sneha', 70000, 2, 'Bangalore'),
+    -> (105, 'Kiran', 40000, 3, 'Chennai'),
+    -> (106, 'Anil', 65000, 3, 'Delhi'),
+    -> (107, 'Meena', 50000, 4, 'Mumbai'),
+    -> (108, 'Vijay', 75000, 2, 'Pune'),
+    -> (109, 'Deepa', 48000, 3, 'Bangalore');
+Query OK, 9 rows affected (0.04 sec)
+Records: 9  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM employees;
++--------+----------+----------+---------+-----------+
+| emp_id | emp_name | salary   | dept_id | city      |
++--------+----------+----------+---------+-----------+
+|    101 | Rahul    | 45000.00 |       1 | Bangalore |
+|    102 | Priya    | 60000.00 |       2 | Mumbai    |
+|    103 | Arun     | 55000.00 |       2 | Delhi     |
+|    104 | Sneha    | 70000.00 |       2 | Bangalore |
+|    105 | Kiran    | 40000.00 |       3 | Chennai   |
+|    106 | Anil     | 65000.00 |       3 | Delhi     |
+|    107 | Meena    | 50000.00 |       4 | Mumbai    |
+|    108 | Vijay    | 75000.00 |       2 | Pune      |
+|    109 | Deepa    | 48000.00 |       3 | Bangalore |
++--------+----------+----------+---------+-----------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT city
+    -> FROM employees
+    ->
+    -> UNION
+    ->
+    -> SELECT location
+    -> FROM departments;
++-----------+
+| city      |
++-----------+
+| Bangalore |
+| Mumbai    |
+| Delhi     |
+| Chennai   |
+| Pune      |
++-----------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT city FROM employees;
++-----------+
+| city      |
++-----------+
+| Bangalore |
+| Mumbai    |
+| Delhi     |
+| Bangalore |
+| Chennai   |
+| Delhi     |
+| Mumbai    |
+| Pune      |
+| Bangalore |
++-----------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT location FROM departments;
++-----------+
+| location  |
++-----------+
+| Bangalore |
+| Mumbai    |
+| Delhi     |
+| Chennai   |
+| Pune      |
++-----------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT city FROM employees
+    -> UNION
+    -> SELECT location FROM departments;
++-----------+
+| city      |
++-----------+
+| Bangalore |
+| Mumbai    |
+| Delhi     |
+| Chennai   |
+| Pune      |
++-----------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT city
+    -> FROM employees
+    ->
+    -> UNION ALL
+    ->
+    -> SELECT location
+    -> FROM departments;
++-----------+
+| city      |
++-----------+
+| Bangalore |
+| Mumbai    |
+| Delhi     |
+| Bangalore |
+| Chennai   |
+| Delhi     |
+| Mumbai    |
+| Pune      |
+| Bangalore |
+| Bangalore |
+| Mumbai    |
+| Delhi     |
+| Chennai   |
+| Pune      |
++-----------+
+14 rows in set (0.00 sec)
+
+mysql> SELECT dept_id, SUM(salary) AS total_salary
+    -> FROM employees
+    -> GROUP BY dept_id;
++---------+--------------+
+| dept_id | total_salary |
++---------+--------------+
+|       1 |     45000.00 |
+|       2 |    260000.00 |
+|       3 |    153000.00 |
+|       4 |     50000.00 |
++---------+--------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT dept_id, COUNT(*) AS employee_count
+    -> FROM employees
+    -> GROUP BY dept_id;
++---------+----------------+
+| dept_id | employee_count |
++---------+----------------+
+|       1 |              1 |
+|       2 |              4 |
+|       3 |              3 |
+|       4 |              1 |
++---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT dept_id, COUNT(*) AS employee_count
+    -> FROM employees
+    -> GROUP BY dept_id
+    -> HAVING COUNT(*) > 3;
++---------+----------------+
+| dept_id | employee_count |
++---------+----------------+
+|       2 |              4 |
++---------+----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT dept_id, AVG(salary) AS average_salary
+    -> FROM employees
+    -> GROUP BY dept_id
+    -> HAVING AVG(salary) > 50000;
++---------+----------------+
+| dept_id | average_salary |
++---------+----------------+
+|       2 |   65000.000000 |
+|       3 |   51000.000000 |
++---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     e.emp_name,
+    ->     d.dept_name,
+    ->     e.salary
+    -> FROM employees AS e
+    -> JOIN departments AS d
+    ->     ON e.dept_id = d.dept_id;
++----------+-----------+----------+
+| emp_name | dept_name | salary   |
++----------+-----------+----------+
+| Rahul    | HR        | 45000.00 |
+| Priya    | IT        | 60000.00 |
+| Arun     | IT        | 55000.00 |
+| Sneha    | IT        | 70000.00 |
+| Vijay    | IT        | 75000.00 |
+| Kiran    | Finance   | 40000.00 |
+| Anil     | Finance   | 65000.00 |
+| Deepa    | Finance   | 48000.00 |
+| Meena    | Marketing | 50000.00 |
++----------+-----------+----------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     e.emp_name,
+    ->     d.dept_name,
+    ->     e.salary
+    -> FROM employees e
+    -> INNER JOIN departments d
+    ->     ON e.dept_id = d.dept_id;
++----------+-----------+----------+
+| emp_name | dept_name | salary   |
++----------+-----------+----------+
+| Rahul    | HR        | 45000.00 |
+| Priya    | IT        | 60000.00 |
+| Arun     | IT        | 55000.00 |
+| Sneha    | IT        | 70000.00 |
+| Vijay    | IT        | 75000.00 |
+| Kiran    | Finance   | 40000.00 |
+| Anil     | Finance   | 65000.00 |
+| Deepa    | Finance   | 48000.00 |
+| Meena    | Marketing | 50000.00 |
++----------+-----------+----------+
+9 rows in set (0.00 sec)
+
+mysql> ON e.dept_id = d.dept_id
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ON e.dept_id = d.dept_id' at line 1
+mysql> SELECT
+    ->     d.dept_name,
+    ->     e.emp_name,
+    ->     e.salary
+    -> FROM departments d
+    -> LEFT JOIN employees e
+    ->     ON d.dept_id = e.dept_id;
++------------+----------+----------+
+| dept_name  | emp_name | salary   |
++------------+----------+----------+
+| HR         | Rahul    | 45000.00 |
+| IT         | Priya    | 60000.00 |
+| IT         | Arun     | 55000.00 |
+| IT         | Sneha    | 70000.00 |
+| IT         | Vijay    | 75000.00 |
+| Finance    | Kiran    | 40000.00 |
+| Finance    | Anil     | 65000.00 |
+| Finance    | Deepa    | 48000.00 |
+| Marketing  | Meena    | 50000.00 |
+| Production | NULL     |     NULL |
++------------+----------+----------+
+10 rows in set (0.00 sec)
+
+mysql> CREATE TABLE projects (
+    ->     project_id INT PRIMARY KEY,
+    ->     project_name VARCHAR(100),
+    ->     emp_id INT,
+    ->     FOREIGN KEY (emp_id) REFERENCES employees(emp_id)
+    -> );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> INSERT INTO projects (project_id, project_name, emp_id)
+    -> VALUES
+    -> (201, 'Website Development', 102),
+    -> (202, 'Mobile App Development', 103),
+    -> (203, 'Payroll System', 106),
+    -> (204, 'Marketing Campaign', 107),
+    -> (205, 'Production Automation', 108);
+Query OK, 5 rows affected (0.07 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM projects;
++------------+------------------------+--------+
+| project_id | project_name           | emp_id |
++------------+------------------------+--------+
+|        201 | Website Development    |    102 |
+|        202 | Mobile App Development |    103 |
+|        203 | Payroll System         |    106 |
+|        204 | Marketing Campaign     |    107 |
+|        205 | Production Automation  |    108 |
++------------+------------------------+--------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     e.emp_name,
+    ->     d.dept_name,
+    ->     p.project_name
+    -> FROM employees e
+    -> INNER JOIN departments d
+    ->     ON e.dept_id = d.dept_id
+    -> INNER JOIN projects p
+    ->     ON e.emp_id = p.emp_id;
++----------+-----------+------------------------+
+| emp_name | dept_name | project_name           |
++----------+-----------+------------------------+
+| Priya    | IT        | Website Development    |
+| Arun     | IT        | Mobile App Development |
+| Anil     | Finance   | Payroll System         |
+| Meena    | Marketing | Marketing Campaign     |
+| Vijay    | IT        | Production Automation  |
++----------+-----------+------------------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT AVG(salary)
+    -> FROM employees;
++--------------+
+| AVG(salary)  |
++--------------+
+| 56444.444444 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT emp_name, salary
+    -> FROM employees
+    -> WHERE salary > (
+    ->     SELECT AVG(salary)
+    ->     FROM employees
+    -> );
++----------+----------+
+| emp_name | salary   |
++----------+----------+
+| Priya    | 60000.00 |
+| Sneha    | 70000.00 |
+| Anil     | 65000.00 |
+| Vijay    | 75000.00 |
++----------+----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT AVG(salary)
+    -> FROM employees;
++--------------+
+| AVG(salary)  |
++--------------+
+| 56444.444444 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT dept_id, COUNT(*) AS employee_count
+    -> FROM employees
+    -> GROUP BY dept_id;
++---------+----------------+
+| dept_id | employee_count |
++---------+----------------+
+|       1 |              1 |
+|       2 |              4 |
+|       3 |              3 |
+|       4 |              1 |
++---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT dept_id
+    -> FROM employees
+    -> GROUP BY dept_id
+    -> ORDER BY COUNT(*) DESC
+    -> LIMIT 1;
++---------+
+| dept_id |
++---------+
+|       2 |
++---------+
+1 row in set (0.00 sec)
+
+mysql> SELECT emp_name, dept_id
+    -> FROM employees
+    -> WHERE dept_id = (
+    ->     SELECT dept_id
+    ->     FROM employees
+    ->     GROUP BY dept_id
+    ->     ORDER BY COUNT(*) DESC
+    ->     LIMIT 1
+    -> );
++----------+---------+
+| emp_name | dept_id |
++----------+---------+
+| Priya    |       2 |
+| Arun     |       2 |
+| Sneha    |       2 |
+| Vijay    |       2 |
++----------+---------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT d.dept_id, d.dept_name
+    -> FROM departments d
+    -> WHERE EXISTS (
+    ->     SELECT 1
+    ->     FROM employees e
+    ->     WHERE e.dept_id = d.dept_id
+    -> );
++---------+-----------+
+| dept_id | dept_name |
++---------+-----------+
+|       1 | HR        |
+|       2 | IT        |
+|       3 | Finance   |
+|       4 | Marketing |
++---------+-----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT d.dept_id, d.dept_name
+    -> FROM departments d
+    -> WHERE NOT EXISTS (
+    ->     SELECT 1
+    ->     FROM employees e
+    ->     WHERE e.dept_id = d.dept_id
+    -> );
++---------+------------+
+| dept_id | dept_name  |
++---------+------------+
+|       5 | Production |
++---------+------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     dept_id,
+    ->     average_salary
+    -> FROM (
+    ->     SELECT
+    ->         dept_id,
+    ->         AVG(salary) AS average_salary
+    ->     FROM employees
+    ->     GROUP BY dept_id
+    -> ) AS dept_average
+    -> WHERE average_salary > 45000;
++---------+----------------+
+| dept_id | average_salary |
++---------+----------------+
+|       2 |   65000.000000 |
+|       3 |   51000.000000 |
+|       4 |   50000.000000 |
++---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> INSERT INTO employees
+    -> (emp_id, emp_name, salary, dept_id, city)
+    -> VALUES
+    -> (110, 'Ravi', 52000, 1, 'Bangalore'),
+    -> (111, 'Asha', 58000, 4, 'Chennai');
+Query OK, 2 rows affected (0.04 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM employees;
++--------+----------+----------+---------+-----------+
+| emp_id | emp_name | salary   | dept_id | city      |
++--------+----------+----------+---------+-----------+
+|    101 | Rahul    | 45000.00 |       1 | Bangalore |
+|    102 | Priya    | 60000.00 |       2 | Mumbai    |
+|    103 | Arun     | 55000.00 |       2 | Delhi     |
+|    104 | Sneha    | 70000.00 |       2 | Bangalore |
+|    105 | Kiran    | 40000.00 |       3 | Chennai   |
+|    106 | Anil     | 65000.00 |       3 | Delhi     |
+|    107 | Meena    | 50000.00 |       4 | Mumbai    |
+|    108 | Vijay    | 75000.00 |       2 | Pune      |
+|    109 | Deepa    | 48000.00 |       3 | Bangalore |
+|    110 | Ravi     | 52000.00 |       1 | Bangalore |
+|    111 | Asha     | 58000.00 |       4 | Chennai   |
++--------+----------+----------+---------+-----------+
+11 rows in set (0.00 sec)
+
+mysql> UPDATE employees
+    -> SET salary = 60000
+    -> WHERE emp_id = 110;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE emp_id = 110;
++--------+----------+----------+---------+-----------+
+| emp_id | emp_name | salary   | dept_id | city      |
++--------+----------+----------+---------+-----------+
+|    110 | Ravi     | 60000.00 |       1 | Bangalore |
++--------+----------+----------+---------+-----------+
+1 row in set (0.00 sec)
+
+mysql> DELETE FROM employees
+    -> WHERE emp_id = 111;
+Query OK, 1 row affected (0.04 sec)
+
+mysql> SELECT * FROM employees;
++--------+----------+----------+---------+-----------+
+| emp_id | emp_name | salary   | dept_id | city      |
++--------+----------+----------+---------+-----------+
+|    101 | Rahul    | 45000.00 |       1 | Bangalore |
+|    102 | Priya    | 60000.00 |       2 | Mumbai    |
+|    103 | Arun     | 55000.00 |       2 | Delhi     |
+|    104 | Sneha    | 70000.00 |       2 | Bangalore |
+|    105 | Kiran    | 40000.00 |       3 | Chennai   |
+|    106 | Anil     | 65000.00 |       3 | Delhi     |
+|    107 | Meena    | 50000.00 |       4 | Mumbai    |
+|    108 | Vijay    | 75000.00 |       2 | Pune      |
+|    109 | Deepa    | 48000.00 |       3 | Bangalore |
+|    110 | Ravi     | 60000.00 |       1 | Bangalore |
++--------+----------+----------+---------+-----------+
+10 rows in set (0.00 sec)
+
+mysql>
